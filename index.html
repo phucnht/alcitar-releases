@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>AlciTar: free guitar practice player</title>
+<meta name="description" content="AlciTar is a free, offline guitar practice player for your own Guitar Pro files, with speed trainer, loop, per-track mute and solo, and sync to real audio. No account, no subscription.">
+<link rel="icon" href="assets/icon.png">
+<style>
+:root {
+  --bg-0-light: #FDFCF8; --bg-1-light: #F5F0E1; --bg-2-light: #EDE5D2;
+  --fg-0-light: #3A3128; --fg-1-light: #52473B; --fg-muted-light: #6E6355;
+  --border-light: rgba(58, 49, 40, 0.14);
+  --accent-light: #A15738; --accent-fg-light: #FFFFFF;
+
+  --bg-0-dark: #1F1B17; --bg-1-dark: #26211C; --bg-2-dark: #332C24;
+  --fg-0-dark: #EDE6DA; --fg-1-dark: #CFC4B4; --fg-muted-dark: #A8998A;
+  --border-dark: rgba(237, 230, 218, 0.14);
+  --accent-dark: #D89272; --accent-fg-dark: #231D16;
+
+  --bg-0: var(--bg-0-light); --bg-1: var(--bg-1-light); --bg-2: var(--bg-2-light);
+  --fg-0: var(--fg-0-light); --fg-1: var(--fg-1-light); --fg-muted: var(--fg-muted-light);
+  --border: var(--border-light); --accent: var(--accent-light); --accent-fg: var(--accent-fg-light);
+
+  --font-ui: 'DM Sans Variable', 'DM Sans', -apple-system, 'Segoe UI', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono Variable', 'JetBrains Mono', 'SF Mono', ui-monospace, monospace;
+
+  /* Fallback for browsers without light-dark(). */
+  @media (prefers-color-scheme: dark) {
+    --bg-0: var(--bg-0-dark); --bg-1: var(--bg-1-dark); --bg-2: var(--bg-2-dark);
+    --fg-0: var(--fg-0-dark); --fg-1: var(--fg-1-dark); --fg-muted: var(--fg-muted-dark);
+    --border: var(--border-dark); --accent: var(--accent-dark); --accent-fg: var(--accent-fg-dark);
+  }
+  color-scheme: light dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--bg-0);
+  color: var(--fg-0);
+  font: 400 1rem/1.6 var(--font-ui);
+}
+.wrap { width: min(100% - 32px, 64rem); margin-inline: auto; }
+section, footer { padding-block: clamp(2rem, 6vw, 4rem); }
+h1, h2, h3 { line-height: 1.15; margin: 0; text-wrap: balance; }
+h1 { font-size: clamp(1.75rem, 5.5vw, 3rem); font-weight: 700; letter-spacing: -0.02em; max-width: 22ch; }
+h2 { font-size: clamp(1.4rem, 3.5vw, 1.9rem); font-weight: 650; margin-bottom: 1.25rem; }
+h3 { font-size: 1.05rem; font-weight: 650; margin-bottom: 0.35rem; }
+p { margin: 0 0 1rem; text-wrap: pretty; }
+a { color: var(--accent); text-underline-offset: 0.18em; }
+a:focus-visible, .btn:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+
+.hero { display: grid; gap: 1.25rem; justify-items: start; padding-bottom: 1.5rem; }
+.hero img.icon { width: 72px; height: 72px; border-radius: 16px; }
+.sub { font-size: 1.2rem; color: var(--fg-1); margin: 0; }
+.cta { display: grid; gap: 0.5rem; justify-items: start; }
+.btn {
+  display: inline-block;
+  padding: 0.85rem 1.6rem;
+  min-height: 48px;
+  border-radius: 10px;
+  background: var(--accent);
+  color: var(--accent-fg);
+  font-weight: 650;
+  text-decoration: none;
+}
+.btn:hover { filter: brightness(1.08); }
+.btn.soon { background: var(--bg-2); color: var(--fg-1); border: 1px solid var(--border); }
+.meta { margin: 0; color: var(--fg-muted); font-size: 0.9rem; }
+
+.shot { padding-block: 0 clamp(2rem, 6vw, 4rem); }
+.shot img {
+  display: block; width: 100%; height: auto;
+  border-radius: 12px; border: 1px solid var(--border);
+}
+
+.features { display: grid; gap: 1.25rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr)); list-style: none; padding: 0; margin: 0; }
+.features li { background: var(--bg-1); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem; }
+.features p { margin: 0; color: var(--fg-1); }
+
+.box { background: var(--bg-1); border: 1px solid var(--border); border-left: 4px solid var(--accent); border-radius: 12px; padding: 1.25rem 1.25rem 0.5rem; }
+.box ol { padding-left: 1.25rem; margin: 0 0 1rem; }
+.box li { margin-bottom: 0.4rem; }
+
+.table-wrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; min-width: 0; }
+caption { text-align: start; color: var(--fg-muted); font-size: 0.9rem; padding-bottom: 0.5rem; }
+th, td { text-align: start; padding: 0.7rem 0.75rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+thead th { border-bottom-color: var(--fg-muted); }
+tbody th { font-weight: 500; }
+td.yes { color: var(--accent); font-weight: 650; }
+.note { color: var(--fg-muted); font-size: 0.9rem; margin-top: 1rem; }
+
+footer { border-top: 1px solid var(--border); color: var(--fg-muted); font-size: 0.9rem; }
+footer p { margin: 0; }
+code { font-family: var(--font-mono); font-size: 0.92em; }
+</style>
+</head>
+<body>
+<main>
+<section class="wrap hero">
+  <img class="icon" src="assets/icon.png" width="72" height="72" alt="">
+  <h1>The practice tools tab sites charge for, free and offline, for your own Guitar Pro files.</h1>
+  <p class="sub">No account. No subscription.</p>
+  <div class="cta">
+    <a id="download" class="btn" href="https://github.com/phucnht/alcitar-releases/releases/latest">Download for macOS</a>
+    <p id="meta" class="meta">Apple Silicon &amp; Intel</p>
+  </div>
+</section>
+
+<div class="wrap shot">
+  <picture>
+    <source srcset="assets/hero-dark.webp" media="(prefers-color-scheme: dark)">
+    <img src="assets/hero-light.webp" width="1440" height="620" alt="AlciTar playing a Guitar Pro tab with a guitar and a bass track in horizontal layout, with the current bar highlighted and the transport controls along the bottom.">
+  </picture>
+</div>
+
+<section class="wrap" aria-labelledby="features-h">
+  <h2 id="features-h">What it does</h2>
+  <ul class="features">
+    <li><h3>Guitar Pro files</h3><p>Open your own Guitar Pro files, plus MusicXML, with the embedded backing track and a count-in.</p></li>
+    <li><h3>Multiple tracks, horizontal view</h3><p>Show several tracks at once, mute, solo and set the volume of each, and scroll the score sideways.</p></li>
+    <li><h3>Speed trainer and A/B loop</h3><p>Loop a phrase between two points and raise the speed step by step as you get it clean.</p></li>
+    <li><h3>Sync to YouTube or your own audio</h3><p>Line the score up with a video or a recording you own, bar by bar, and play along with the real thing.</p></li>
+    <li><h3>Fretboard lit by the playing notes</h3><p>See each note land on the neck as it sounds.</p></li>
+    <li><h3>Tuner and metronome</h3><p>Tune up and keep time without leaving the window.</p></li>
+  </ul>
+</section>
+
+<section class="wrap" id="first-launch" aria-labelledby="first-h">
+  <div class="box">
+    <h2 id="first-h">First launch on macOS</h2>
+    <p>AlciTar is not yet notarised by Apple, so macOS asks you to confirm it once. Since macOS Sequoia, Control-click and Open no longer skips this check.</p>
+    <ol>
+      <li>Open <strong>AlciTar</strong> once. macOS says it cannot verify the app; close that dialog.</li>
+      <li>Open <strong>System Settings → Privacy &amp; Security</strong>.</li>
+      <li>Scroll to the message about AlciTar and click <strong>Open Anyway</strong>.</li>
+      <li>Enter your password. After that it opens normally.</li>
+    </ol>
+  </div>
+</section>
+
+<section class="wrap" aria-labelledby="compare-h">
+  <h2 id="compare-h">Free here, paid elsewhere</h2>
+  <div class="table-wrap">
+    <table>
+      <caption>Practice tools in AlciTar and in <a href="https://www.songsterr.com/plus">Songsterr Plus</a></caption>
+      <thead><tr><th scope="col">Tool</th><th scope="col">AlciTar</th><th scope="col">Songsterr</th></tr></thead>
+      <tbody>
+        <tr><th scope="row">Speed control</th><td class="yes">Free</td><td>Plus</td></tr>
+        <tr><th scope="row">Loop</th><td class="yes">Free</td><td>Plus</td></tr>
+        <tr><th scope="row">Mute and solo</th><td class="yes">Free</td><td>Plus</td></tr>
+        <tr><th scope="row">Sync to the original audio</th><td class="yes">Free</td><td>Plus</td></tr>
+        <tr><th scope="row">Offline</th><td class="yes">Free</td><td>Plus</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="note"><a href="https://www.guitar-pro.com/products/1-buy-guitar-pro">Guitar Pro 8</a> is a full tab editor at $69.95, one-time. AlciTar plays and practises tabs; it does not edit them.</p>
+</section>
+
+<section class="wrap" aria-labelledby="req-h">
+  <h2 id="req-h">Requirements</h2>
+  <p>macOS 12 Monterey or later (Safari 17 or later) · Apple Silicon &amp; Intel</p>
+  <p><a href="https://github.com/phucnht/alcitar-releases/releases">All releases</a></p>
+</section>
+</main>
+
+<footer>
+  <div class="wrap"><p>AlciTar is free to use. Source code is private; downloads and this site live at <a href="https://github.com/phucnht/alcitar-releases">phucnht/alcitar-releases</a>.</p></div>
+</footer>
+
+<script>
+(async () => {
+  const a = document.getElementById('download');
+  const meta = document.getElementById('meta');
+  try {
+    const r = await fetch('https://api.github.com/repos/phucnht/alcitar-releases/releases/latest', { headers: { Accept: 'application/vnd.github+json' } });
+    if (r.status === 404) {
+      a.textContent = 'Coming soon';
+      a.classList.add('soon');
+      meta.textContent = 'The first release is not out yet. Apple Silicon & Intel';
+      return;
+    }
+    if (!r.ok) return;
+    const rel = await r.json();
+    const dmg = (rel.assets || []).find((x) => x.name.endsWith('.dmg'));
+    if (!dmg) return;
+    a.href = dmg.browser_download_url;
+    meta.textContent = `${rel.tag_name} · ${(dmg.size / 1e6).toFixed(1)} MB · Apple Silicon & Intel`;
+  } catch { /* offline or rate-limited: keep the plain link */ }
+})();
+</script>
+</body>
+</html>
